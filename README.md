@@ -64,12 +64,19 @@ Use the arrow keys to navigate the menu:
 -   **Configure Tagging**: Enable/Disable AI tagging.
 -   **Settings**: View/Save configuration.
 
+### File Browser
+When selecting a source, you can browse your file system:
+-   `Up`/`Down` (or `j`/`k`): Navigate list.
+-   `Enter` / `Right Arrow`: Enter folder or select file.
+-   `Backspace` / `Left Arrow`: Go up one folder level.
+-   `Tab`: Toggle manual path entry.
+
 ### Conversation Browser
 
 The browser allows you to selectively export conversations.
 
 1.  Select **Browse & Export**.
-2.  Enter the path to your export file/directory.
+2.  Select your export file/directory using the File Browser.
 3.  **Navigate**:
     -   `Up`/`Down`: Select Projects or Conversations.
     -   `Left`/`Right`: Change pages.
@@ -77,6 +84,7 @@ The browser allows you to selectively export conversations.
     -   `Enter`: Preview conversation.
     -   `e`: Export selected items.
     -   `s`: View Stats Dashboard.
+    -   `c`: Change Data Source.
 
 ### Stats Dashboard
 
