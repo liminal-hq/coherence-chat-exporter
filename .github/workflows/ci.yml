@@ -7,33 +7,55 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
-
     - name: Use Node.js 24.x
       uses: actions/setup-node@v4
       with:
         node-version: '24'
         cache: 'npm'
-
     - name: Install dependencies
       run: npm ci
-
     - name: Lint
       run: npm run lint
 
-    - name: Build
-      run: npm run build
-
-    - name: Bundle
-      run: node scripts/bundle.js
-
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 24.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
     - name: Test
       run: npm test
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: reports/junit.xml
 
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 24.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Build
+      run: npm run build
+    - name: Bundle
+      run: node scripts/bundle.js
     - name: Upload Bundle
       uses: actions/upload-artifact@v4
       with:
