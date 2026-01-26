@@ -23,6 +23,10 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js 24.x
@@ -40,6 +44,13 @@ jobs:
       with:
         name: test-results
         path: reports/junit.xml
+    - name: Publish Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Jest Tests
+        path: reports/junit.xml
+        reporter: jest-junit
 
   build:
     runs-on: ubuntu-latest
