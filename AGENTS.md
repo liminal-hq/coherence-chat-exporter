@@ -17,3 +17,9 @@ Documentation, code comments and variables use Canadian English:
 - favour (not favor)
 
 Code identifiers follow web standards (e.g., `color` in CSS, `center` in alignment).
+
+## Git Commit Guidelines
+
+* **Accuracy**: Commit messages must accurately reflect the changes made in the commit.
+* **Granularity**: Avoid monolithic commits that hide multiple unrelated changes under a generic message.
+* **Format**: Use a clear subject line.
