@@ -6,6 +6,7 @@ import { Config, defaultConfig } from './config.js';
 export class ConfigManager {
   private configPath: string;
   private currentConfig: Config;
+  private savePromise: Promise<void> = Promise.resolve();
 
   constructor() {
     this.configPath = this.getConfigPath();
@@ -53,13 +54,19 @@ export class ConfigManager {
     return this.currentConfig;
   }
 
-  public saveConfig(newConfig: Config): void {
+  public async saveConfig(newConfig: Config): Promise<void> {
     this.currentConfig = newConfig;
-    try {
-      fs.writeFileSync(this.configPath, JSON.stringify(newConfig, null, 2), 'utf-8');
-    } catch (e) {
-      console.error('Failed to save config:', e);
-    }
+
+    // Serialize writes to prevent race conditions
+    this.savePromise = this.savePromise.then(async () => {
+      try {
+        await fs.promises.writeFile(this.configPath, JSON.stringify(newConfig, null, 2), 'utf-8');
+      } catch (e) {
+        console.error('Failed to save config:', e);
+      }
+    });
+
+    return this.savePromise;
   }
 
   public getConfig(): Config {

@@ -20,18 +20,17 @@ export const Settings: React.FC<Props> = ({ onBack }) => {
       { label: '🔙 Back', value: 'back' }
   ];
 
-  const handleSelect = (item: any) => {
+  const handleSelect = async (item: any) => {
       if (item.value === 'back') {
           onBack();
       } else if (item.value === 'save') {
-          configManager.saveConfig(config);
+          await configManager.saveConfig(config);
           setMsg('Configuration saved!');
           setTimeout(() => setMsg(''), 2000);
       } else if (item.value === 'toggle_tagging') {
           const newConfig = { ...config };
           newConfig.tagging.enabled = !newConfig.tagging.enabled;
-          configManager.saveConfig(newConfig); // Auto-save on toggle for better UX? Or wait for explicit save?
-          // Let's update state and wait for explicit save to match the menu item
+          // Optimistic update only. User must select "Save Configuration" to persist.
           setConfig(newConfig);
           setMsg('Tagging toggled (Select Save to persist)');
       }
