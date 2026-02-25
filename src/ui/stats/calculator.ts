@@ -1,5 +1,5 @@
 import { Conversation } from '../../providers/types.js';
-import { format, min, max, isValid } from 'date-fns';
+import { format, isValid } from 'date-fns';
 
 export interface StatItem {
   label: string;
@@ -36,7 +36,9 @@ export const calculateStats = (conversations: Conversation[]): ConversationStats
   const projectCounts: Record<string, number> = {};
   const monthCounts: Record<string, number> = {};
   const tagCounts: Record<string, number> = {};
-  const dates: Date[] = [];
+
+  let minTime: number | null = null;
+  let maxTime: number | null = null;
 
   conversations.forEach(conv => {
     // Messages
@@ -44,7 +46,15 @@ export const calculateStats = (conversations: Conversation[]): ConversationStats
 
     // Date
     if (conv.created_at && isValid(conv.created_at)) {
-      dates.push(conv.created_at);
+      const time = conv.created_at.getTime();
+
+      if (minTime === null || time < minTime) {
+        minTime = time;
+      }
+      if (maxTime === null || time > maxTime) {
+        maxTime = time;
+      }
+
       const monthKey = format(conv.created_at, 'yyyy-MM');
       monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1;
     }
@@ -65,9 +75,9 @@ export const calculateStats = (conversations: Conversation[]): ConversationStats
   stats.avgMessagesPerConversation = Math.round((stats.totalMessages / stats.totalConversations) * 10) / 10;
 
   // Date Range
-  if (dates.length > 0) {
-    stats.dateRange.start = min(dates);
-    stats.dateRange.end = max(dates);
+  if (minTime !== null && maxTime !== null) {
+    stats.dateRange.start = new Date(minTime);
+    stats.dateRange.end = new Date(maxTime);
   }
 
   // Helper to sort and map map to StatItem
