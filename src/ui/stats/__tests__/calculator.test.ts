@@ -14,8 +14,8 @@ describe('Stats Calculator', () => {
       {
         uuid: '1',
         title: 'Conv 1',
-        created_at: new Date('2025-01-01'),
-        updated_at: new Date('2025-01-01'),
+        created_at: new Date(2025, 0, 1),
+        updated_at: new Date(2025, 0, 1),
         messages: [
           { uuid: 'm1', sender: 'human', text: 'hi', created_at: new Date() },
           { uuid: 'm2', sender: 'assistant', text: 'hello', created_at: new Date() }
@@ -26,8 +26,8 @@ describe('Stats Calculator', () => {
       {
         uuid: '2',
         title: 'Conv 2',
-        created_at: new Date('2025-02-01'),
-        updated_at: new Date('2025-02-01'),
+        created_at: new Date(2025, 1, 1),
+        updated_at: new Date(2025, 1, 1),
         messages: [
           { uuid: 'm3', sender: 'human', text: 'bye', created_at: new Date() }
         ],
@@ -37,8 +37,8 @@ describe('Stats Calculator', () => {
       {
         uuid: '3',
         title: 'Conv 3',
-        created_at: new Date('2025-02-15'),
-        updated_at: new Date('2025-02-15'),
+        created_at: new Date(2025, 1, 15),
+        updated_at: new Date(2025, 1, 15),
         messages: [],
         tags: [], // No tags
         // No project (undefined)
