@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import AdmZip from 'adm-zip';
+import yauzl from 'yauzl';
 
 export interface ExportData {
   conversations: any; // The parsed JSON content of conversations.json
@@ -70,36 +70,105 @@ export class InputResolver {
     return { conversations, projects };
   }
 
-  private async resolveZip(zipPath: string): Promise<ExportData> {
-    // AdmZip is synchronous only for constructor.
-    // It has a readFileAsync but it takes a callback.
-    // For simpler extraction, standard sync getEntries is common unless large files.
-    // However, since we are doing async refactor, let's wrap what we can.
-    // AdmZip is primarily sync.
-
+  private resolveZip(zipPath: string): Promise<ExportData> {
     return new Promise((resolve, reject) => {
-        try {
-            const zip = new AdmZip(zipPath);
-            const zipEntries = zip.getEntries();
-
-            const convEntry = zipEntries.find(entry => entry.entryName.endsWith('conversations.json'));
-            if (!convEntry) {
-                reject(new Error('conversations.json not found in zip archive'));
-                return;
+        yauzl.open(zipPath, { lazyEntries: true }, (err, zipfile) => {
+            if (err) {
+                return reject(err);
+            }
+            if (!zipfile) {
+                 return reject(new Error('Failed to open zip file'));
             }
 
-            const conversations = JSON.parse(convEntry.getData().toString('utf8'));
+            let conversationsData: Buffer | null = null;
+            let projectsData: Buffer | null = null;
+            let conversationsFound = false;
 
-            let projects;
-            const projEntry = zipEntries.find(entry => entry.entryName.endsWith('projects.json'));
-            if (projEntry) {
-                projects = JSON.parse(projEntry.getData().toString('utf8'));
-            }
+            // Ensure close happens on error or completion
+            const cleanup = () => {
+                try {
+                    zipfile.close();
+                } catch (e) {
+                    // ignore if already closed
+                }
+            };
 
-            resolve({ conversations, projects });
-        } catch (e) {
-            reject(e);
-        }
+            zipfile.readEntry();
+
+            zipfile.on('entry', (entry) => {
+                if (entry.fileName.endsWith('conversations.json')) {
+                    conversationsFound = true;
+                    zipfile.openReadStream(entry, (err, readStream) => {
+                        if (err) {
+                            cleanup();
+                            return reject(err);
+                        }
+                        if (!readStream) {
+                            cleanup();
+                            return reject(new Error('Failed to read stream'));
+                        }
+
+                        const chunks: Buffer[] = [];
+                        readStream.on('data', (chunk) => chunks.push(chunk));
+                        readStream.on('end', () => {
+                            conversationsData = Buffer.concat(chunks);
+                            zipfile.readEntry();
+                        });
+                        readStream.on('error', (e) => {
+                            cleanup();
+                            reject(e);
+                        });
+                    });
+                } else if (entry.fileName.endsWith('projects.json')) {
+                    zipfile.openReadStream(entry, (err, readStream) => {
+                        if (err) {
+                            cleanup();
+                            return reject(err);
+                        }
+                        if (!readStream) {
+                            cleanup();
+                            return reject(new Error('Failed to read stream'));
+                        }
+
+                        const chunks: Buffer[] = [];
+                        readStream.on('data', (chunk) => chunks.push(chunk));
+                        readStream.on('end', () => {
+                            projectsData = Buffer.concat(chunks);
+                            zipfile.readEntry();
+                        });
+                        readStream.on('error', (e) => {
+                            cleanup();
+                            reject(e);
+                        });
+                    });
+                } else {
+                    zipfile.readEntry();
+                }
+            });
+
+            zipfile.on('end', () => {
+                cleanup();
+                if (!conversationsFound || !conversationsData) {
+                    return reject(new Error('conversations.json not found in zip archive'));
+                }
+
+                try {
+                    const conversations = JSON.parse(conversationsData.toString('utf8'));
+                    let projects;
+                    if (projectsData) {
+                        projects = JSON.parse(projectsData.toString('utf8'));
+                    }
+                    resolve({ conversations, projects });
+                } catch (e) {
+                    reject(e);
+                }
+            });
+
+            zipfile.on('error', (e) => {
+                cleanup();
+                reject(e);
+            });
+        });
     });
   }
 
