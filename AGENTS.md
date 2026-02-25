@@ -27,3 +27,10 @@ Code identifiers follow web standards (e.g., `color` in CSS, `center` in alignme
   * what changed
   * why it changed
 * **Backticks**: In commit bodies, wrap technical tokens in backticks (for example file names, commands, package names, types, and dependency refs).
+
+## Shell Backtick Safety
+
+* **Avoid inline markdown in shell strings**: When a command includes markdown text with backticks (for example commit or PR bodies), do not place that text directly inside double-quoted shell command strings.
+* **Use file-based input**: Prefer creating a temporary file with a single-quoted heredoc (`cat > /tmp/body.md <<'EOF'`) and pass it using flags like `--body-file` or `--file`.
+* **Escape only as fallback**: If inline text is unavoidable, escape each backtick as `\\``.
+* **Recovery steps if interpolation occurs**: If you see `zsh: command not found` from backtick content, stop, rerun with file-based input, and verify the final body/message contains the intended backticks before proceeding.
