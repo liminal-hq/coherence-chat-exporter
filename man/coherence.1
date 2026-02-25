@@ -1,0 +1,102 @@
+.TH COHERENCE 1 "February 2024" "1.0.0" "User Commands"
+.SH NAME
+coherence \- Coherence Chat Exporter: Export Claude/ChatGPT conversations to Markdown
+.SH SYNOPSIS
+.B coherence
+[\fIcommand\fR] [\fIoptions\fR]
+.br
+.B coherence
+(starts interactive mode)
+.SH DESCRIPTION
+.B coherence
+is a CLI tool with a TUI (Text User Interface) for exporting and organising Claude and ChatGPT conversations into readable Markdown files. It supports processing individual JSON files, directories of files, or ZIP archives.
+
+If no command is specified, \fBcoherence\fR launches in \fBInteractive Mode\fR, allowing users to browse, search, and select conversations for export using a terminal interface.
+.SH INTERACTIVE MODE
+When launched without arguments, \fBcoherence\fR provides a TUI for easy navigation.
+.SS Navigation
+The interface is designed with keyboard-centric navigation in mind, supporting both arrow keys and Vim-style bindings.
+.TP
+.B Up / k
+Move selection up.
+.TP
+.B Down / j
+Move selection down.
+.TP
+.B Enter / Right / l
+Select an item or enter a directory.
+.TP
+.B Backspace / Left / h
+Go back to the previous view or parent directory.
+.TP
+.B c
+Change data source (return to File Browser).
+.TP
+.B /
+Search conversations (in lists).
+.SS Behaviour
+The interface uses an alternate screen buffer to avoid cluttering your terminal history. Upon exit, the terminal state is restored. The TUI features a comprehensive dashboard for viewing conversation statistics and managing exports.
+.SH COMMANDS
+.TP
+.B export
+Export conversations directly from the command line without entering the TUI.
+.TP
+.B completion
+Generate a shell completion script for Bash, Zsh, or Fish.
+.SH OPTIONS
+The following options are available for the \fBexport\fR command:
+.TP
+.BR \-p ", " \-\-provider " \fItype\fR"
+Specify the provider type. Valid values are \fBclaude\fR or \fBchatgpt\fR. This is required.
+.TP
+.BR \-i ", " \-\-input " \fIpath\fR"
+Path to the input file, directory, or ZIP archive containing the conversations. This is required.
+.TP
+.BR \-o ", " \-\-output " \fIpath\fR"
+Directory where the exported Markdown files will be saved. Defaults to \fB./output\fR.
+.TP
+.B \-\-tag
+Enable AI tagging. This attempts to classify conversations using a local AI model. Note that this may require significant system resources.
+.TP
+.B \-\-no\-tag
+Disable AI tagging explicitly, overriding configuration defaults.
+.TP
+.B \-h, \-\-help
+Display help information.
+.SH EXAMPLES
+.SS Interactive Mode
+Simply run the command to start the TUI:
+.PP
+.nf
+$ coherence
+.fi
+.SS Exporting Claude Conversations
+Export conversations from a ZIP file to a specific directory:
+.PP
+.nf
+$ coherence export \-\-provider claude \-\-input ./claude_export.zip \-\-output ./my_notes
+.fi
+.SS Exporting ChatGPT Conversations with Tagging
+Export from a JSON file and enable AI tagging:
+.PP
+.nf
+$ coherence export \-p chatgpt \-i conversations.json \-\-tag
+.fi
+.SS Generating Shell Completion
+Generate and source a completion script for Zsh:
+.PP
+.nf
+$ coherence completion zsh > _coherence
+$ source _coherence
+.fi
+.SH FILES
+.TP
+.B ~/.config/coherence/config.json
+User configuration file (path may vary based on XDG_CONFIG_HOME).
+.TP
+.B ~/.local/share/coherence/
+Data storage for the application.
+.SH BUGS
+Please report any bugs or issues to the GitHub repository issue tracker.
+.SH AUTHOR
+Maintained by the Coherence Chat Exporter team.

@@ -5,6 +5,11 @@
 * The `README.md` file should be updated with new feature information when applicable.
 * The `SPEC.md` file is the source of truth for the project's design. Do not let it drift from the actual implementation.
 
+## Documentation Maintenance
+* **Man Page**: The `man/coherence.1` file must be kept up-to-date.
+    * If you add new commands, flags, or significantly change the interactive behaviour, you **MUST** update the man page.
+    * Ensure `roff` syntax is valid and Canadian English spelling is used.
+
 ## Canadian English Spelling
 
 Documentation, code comments and variables **MUST** use Canadian English spelling:
