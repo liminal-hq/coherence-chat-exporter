@@ -3,6 +3,8 @@ import { MarkdownTransformer } from './transformer.js';
 import { Organizer } from './organizer.js';
 import { Writer } from './writer.js';
 import { ConversationTagger } from '../tagging/classifier.js';
+import { pMap } from '../utils/async-utils.js';
+import * as os from 'os';
 
 interface ExportOptions {
   enableTagging: boolean;
@@ -37,9 +39,10 @@ export class ExportPipeline {
         conversations = await this.provider.normalize(data);
     }
 
-    const results: ExportResult[] = [];
+    // Use concurrency based on CPU cores, with a sensible default if os.cpus() fails or is empty
+    const concurrency = Math.max(1, (os.cpus()?.length || 1) * 2);
 
-    for (const conv of conversations) {
+    const results = await pMap(conversations, async (conv) => {
       if (options.enableTagging && this.tagger) {
           try {
               conv.tags = await this.tagger.tagConversation(conv);
@@ -52,8 +55,8 @@ export class ExportPipeline {
       const filePath = this.organizer.getPath(conv);
 
       await this.writer.write(filePath, markdown);
-      results.push({ conversation: conv, path: filePath, tags: conv.tags });
-    }
+      return { conversation: conv, path: filePath, tags: conv.tags };
+    }, concurrency);
 
     return results;
   }
