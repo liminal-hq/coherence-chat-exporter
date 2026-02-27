@@ -51,7 +51,7 @@ describe('ConfigManager', () => {
 
   it('saveConfig should handle errors gracefully', async () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    (fs.promises.writeFile as jest.Mock).mockRejectedValueOnce(new Error('Write failed'));
+    (fs.promises.writeFile as jest.Mock).mockRejectedValueOnce(new Error('Write failed') as never);
 
     const mockConfig: any = { outputPath: './test' };
 
