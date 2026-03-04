@@ -8,14 +8,18 @@ import { format } from 'date-fns';
 interface Props {
   conversations: Conversation[];
   onBack: () => void;
+  onChangeSource?: () => void;
 }
 
-export const StatsDashboard: React.FC<Props> = ({ conversations, onBack }) => {
+export const StatsDashboard: React.FC<Props> = ({ conversations, onBack, onChangeSource }) => {
   const stats = useMemo(() => calculateStats(conversations), [conversations]);
 
   useInput((input, key) => {
     if (key.escape || key.delete || (input === 'b')) {
       onBack();
+    }
+    if ((input === 'c') && onChangeSource) {
+      onChangeSource();
     }
   });
 
@@ -60,7 +64,7 @@ export const StatsDashboard: React.FC<Props> = ({ conversations, onBack }) => {
       <AsciiChart title="📈 Activity (Last 12 Months)" data={stats.activityByMonth.slice(-12)} maxBarWidth={60} />
 
       <Box marginTop={1}>
-        <Text color="gray">Press Esc to go back</Text>
+        <Text color="gray">Press Esc to go back | [c] Change Source</Text>
       </Box>
     </Box>
   );
