@@ -6,6 +6,13 @@ import gradient from 'gradient-string';
 
 interface Props {
   onSelect: (value: string) => void;
+  hasData?: boolean;
+}
+
+// ItemProps must match ink-select-input's definition which does NOT include 'value'
+interface ItemProps {
+    isSelected?: boolean;
+    label: string;
 }
 
 // A more dramatic ASCII brain (side view with convolutions)
@@ -24,7 +31,7 @@ const BRAIN_ASCII = `
 // Pinkish color from Noto Color Emoji brain
 const BRAIN_PINK = "#F48FB1";
 
-export const MainMenu: React.FC<Props> = ({ onSelect }) => {
+export const MainMenu: React.FC<Props> = ({ onSelect, hasData = false }) => {
   const { stdout } = useStdout();
   const width = stdout?.columns || 80;
 
@@ -39,8 +46,9 @@ export const MainMenu: React.FC<Props> = ({ onSelect }) => {
   }, []);
 
   const items = [
-    { label: '📦 Select Export Source', value: 'source' },
+    { label: hasData ? '📦 Load New Source' : '📦 Load Export Data (Start Here)', value: 'source' },
     { label: '📂 Browse & Export', value: 'browse' },
+    { label: '🔍 Search', value: 'search' },
     { label: '📊 Stats Dashboard', value: 'stats' },
     { label: '🏷️  Configure Tagging', value: 'tagging' },
     { label: '⚙️  Settings', value: 'settings' },
@@ -55,16 +63,43 @@ export const MainMenu: React.FC<Props> = ({ onSelect }) => {
 
   return (
     <Box flexDirection="column" padding={1}>
+      <Text bold color="cyan">Chat Archive Tool</Text>
       {/* Top Logo */}
       <Box marginBottom={1}>
         <Text>{logo}</Text>
+      {!hasData && (
+          <Box marginTop={1} borderStyle="single" borderColor="yellow">
+              <Text color="yellow">No data loaded. Please load an export file to begin.</Text>
+          </Box>
+      )}
       </Box>
 
       {/* Content Area */}
       <Box flexDirection="row">
         {/* Left Column: Menu */}
         <Box flexDirection="column" marginRight={4}>
-          <SelectInput items={items} onSelect={(item) => onSelect(item.value)} />
+          <SelectInput
+            items={items}
+            onSelect={(item) => onSelect(item.value)}
+            itemComponent={(props: ItemProps) => {
+                // Determine disabled state based on label content since 'value' is not passed to itemComponent
+                const label = props.label;
+                const requiresData =
+                    label.includes('Browse') ||
+                    label.includes('Search') ||
+                    label.includes('Stats');
+
+                const isDisabled = requiresData && !hasData;
+
+                return (
+                    <Text color={props.isSelected ? 'cyan' : (isDisabled ? 'gray' : 'white')}>
+                        {props.isSelected ? '> ' : '  '}
+                        {props.label}
+                        {isDisabled ? ' (Requires Data)' : ''}
+                    </Text>
+                );
+            }}
+        />
         </Box>
 
         {/* Right Column: Brain */}

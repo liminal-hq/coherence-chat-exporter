@@ -21,7 +21,7 @@ describe('MainMenu', () => {
     // Check for a distinctive part of the ASCII art derived from "Coherence"
     expect(output).toContain('/ ___|___ | |__');
 
-    expect(output).toContain('Select Export Source');
+    expect(output).toContain('Load Export Data (Start Here)');
     expect(output).toContain('Exit');
   });
 

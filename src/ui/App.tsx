@@ -42,6 +42,7 @@ enum AppMode {
 enum MenuOption {
   Source = 'source',
   Browse = 'browse',
+  Search = 'search',
   Stats = 'stats',
   Tagging = 'tagging',
   Settings = 'settings',
@@ -74,6 +75,13 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
         else process.exit(0);
         return;
     }
+
+    // If Browse or Search is selected but no data is loaded, redirect to Source selection
+    if ((value === MenuOption.Browse || value === MenuOption.Search) && loadedConversations.length === 0) {
+        setMode(AppMode.Browse); // Intend to browse after loading
+        setView(AppView.SelectProvider);
+        return;
+    }
     if (value === MenuOption.Source) {
         setMode(AppMode.Export);
         // If we have a session path, allow user to confirm or change
@@ -94,6 +102,10 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
         } else {
             setView(AppView.SelectProvider);
         }
+    }
+    if (value === MenuOption.Search) {
+        setMode(AppMode.Browse);
+        setView(AppView.Browser);
     }
     if (value === MenuOption.Stats) {
         setMode(AppMode.Stats);
@@ -216,7 +228,12 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
 
   return (
     <FullScreenLayout>
-      {view === AppView.Menu && <MainMenu onSelect={handleMenuSelect} />}
+      {view === AppView.Menu && (
+        <MainMenu
+           onSelect={handleMenuSelect}
+           hasData={loadedConversations.length > 0}
+        />
+      )}
       {view === AppView.SelectProvider && (
           <ProviderSelect onSelect={handleProviderSelect} onBack={() => setView(AppView.Menu)} />
       )}
