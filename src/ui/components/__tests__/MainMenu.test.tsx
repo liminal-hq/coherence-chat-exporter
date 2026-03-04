@@ -36,4 +36,13 @@ describe('MainMenu', () => {
      // "      _---~~(~~-._"
      expect(output).toContain("_---~~(~~-._");
   });
+
+  test('shows data-ready menu state when data is loaded', () => {
+    const { lastFrame } = render(<MainMenu onSelect={() => {}} hasData />);
+    const output = lastFrame();
+
+    expect(output).toContain('Load New Source');
+    expect(output).toContain('Search');
+    expect(output).not.toContain('No data loaded');
+  });
 });
