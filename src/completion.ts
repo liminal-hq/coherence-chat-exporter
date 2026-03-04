@@ -12,7 +12,7 @@ export function registerCompletionCommand(program: Command) {
     });
 }
 
-function generateCompletionScript(shell: string, program: Command): string {
+function generateCompletionScript(shell: string, _program: Command): string {
     // Basic completion script generation.
     // In a production environment with `commander`, we might use `omelette` or `tabtab`
     // but `commander` has no built-in "output completion script" feature out of the box for all shells

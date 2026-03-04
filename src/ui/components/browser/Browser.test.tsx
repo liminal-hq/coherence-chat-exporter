@@ -92,4 +92,21 @@ describe('Browser Component', () => {
       expect(frame).toContain('Project Alpha Chat');
       expect(frame).not.toContain('Project Beta Chat');
   });
+
+  test('opens deep search from project list with slash key', async () => {
+      const { lastFrame, stdin } = render(
+        <Browser
+            conversations={mockConversations}
+            onExport={() => {}}
+            onBack={() => {}}
+        />
+      );
+
+      stdin.write('/');
+      await delay(100);
+
+      const frame = lastFrame();
+      expect(frame).toContain('Deep Content Search');
+      expect(frame).toContain('Type to search...');
+  });
 });

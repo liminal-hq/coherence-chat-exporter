@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { Conversation } from '../../../providers/types.js';
 
 interface ProjectListProps {
   conversations: Conversation[];
   onSelectProject: (projectName: string | null) => void;
+  onSearch: () => void;
   onBack: () => void;
   onViewStats?: () => void;
   onChangeSource?: () => void;
 }
 
-export const ProjectList: React.FC<ProjectListProps> = ({ conversations, onSelectProject, onBack, onViewStats, onChangeSource }) => {
+export const ProjectList: React.FC<ProjectListProps> = ({
+  conversations,
+  onSelectProject,
+  onSearch,
+  onBack,
+  onViewStats,
+  onChangeSource
+}) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Extract unique projects
@@ -40,11 +48,14 @@ export const ProjectList: React.FC<ProjectListProps> = ({ conversations, onSelec
     if (key.return) {
       onSelectProject(items[selectedIndex].value);
     }
-    if (key.escape || key.backspace) {
-        onBack();
+    if (input === '/') {
+        onSearch();
     }
     if (input === 's' && onViewStats) {
         onViewStats();
+    }
+    if (key.escape || key.backspace) {
+        onBack();
     }
     if ((input === 'c') && onChangeSource) {
         onChangeSource();
@@ -62,8 +73,10 @@ export const ProjectList: React.FC<ProjectListProps> = ({ conversations, onSelec
           </Text>
         </Box>
       ))}
-      <Box marginTop={1}>
-        <Text color="gray">[Enter] Select  [s] Stats  [c] Change Source  [Esc] Back</Text>
+      <Box marginTop={1} borderStyle="single" borderColor="gray">
+          <Text>
+              <Text bold color="green">Enter</Text>: Select | <Text bold color="green">s</Text>: Stats | <Text bold color="green">/</Text>: Search | <Text bold color="green">c</Text>: Change Source | <Text bold color="green">Esc</Text>: Back
+          </Text>
       </Box>
     </Box>
   );

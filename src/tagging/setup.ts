@@ -1,8 +1,4 @@
 // Placeholder for explicit download setup if we want to separate it from inference
-import { env } from '@huggingface/transformers';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as os from 'os';
 
 export async function setupModelCache() {
     // Configure cache directory

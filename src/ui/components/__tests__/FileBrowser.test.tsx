@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from 'ink-testing-library';
-import { FileBrowser } from '../FileBrowser.js';
 import { jest } from '@jest/globals';
 
 // We need to use unstable_mockModule for ESM mocking of 'fs'
@@ -37,7 +36,7 @@ describe('FileBrowser', () => {
             { name: 'file1.json', isDirectory: () => false }
         ]);
 
-        const { lastFrame, rerender } = render(
+        const { lastFrame } = render(
             <FileBrowserComponent
                 prompt="Select File"
                 onSubmit={() => {}}

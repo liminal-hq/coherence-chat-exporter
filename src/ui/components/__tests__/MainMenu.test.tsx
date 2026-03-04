@@ -21,7 +21,7 @@ describe('MainMenu', () => {
     // Check for a distinctive part of the ASCII art derived from "Coherence"
     expect(output).toContain('/ ___|___ | |__');
 
-    expect(output).toContain('Select Export Source');
+    expect(output).toContain('Load Export Data (Start Here)');
     expect(output).toContain('Exit');
   });
 
@@ -35,5 +35,14 @@ describe('MainMenu', () => {
      // Check for distinctive part of the new "dramatic" brain
      // "      _---~~(~~-._"
      expect(output).toContain("_---~~(~~-._");
+  });
+
+  test('shows data-ready menu state when data is loaded', () => {
+    const { lastFrame } = render(<MainMenu onSelect={() => {}} hasData />);
+    const output = lastFrame();
+
+    expect(output).toContain('Load New Source');
+    expect(output).toContain('Search');
+    expect(output).not.toContain('No data loaded');
   });
 });

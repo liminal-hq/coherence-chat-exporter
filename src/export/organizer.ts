@@ -17,7 +17,7 @@ export class Organizer {
     const folder = path.join(year, `${month}-${monthName}`);
 
     // Filename: {day}-{slug}.md
-    // @ts-ignore: slugify types mismatch with ESM in this setup, but runtime is fine
+    // @ts-expect-error: slugify types mismatch with ESM in this setup, but runtime is fine
     const slug = slugify(conversation.title, { lower: true, strict: true }).slice(0, 50);
     const filename = `${day}-${slug}.md`;
 

@@ -21,7 +21,7 @@ export class ConfigManager {
     if (!fs.existsSync(configDir)) {
       try {
         fs.mkdirSync(configDir, { recursive: true });
-      } catch (e) {
+      } catch {
         // Fallback to local directory if permission denied (e.g. in sandbox)
         return path.join(process.cwd(), '.chat-archive-config.json');
       }
