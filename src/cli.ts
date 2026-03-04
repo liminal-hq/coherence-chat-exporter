@@ -87,21 +87,27 @@ program
     }
   });
 
-// Handle interactive mode if no args provided
-if (process.argv.length === 2) {
-    // Set terminal title
-    process.stdout.write('\x1b]0;Coherence Chat Exporter\x07');
-    // Enter alternate screen buffer
-    process.stdout.write('\x1b[?1049h');
+// Handle interactive mode (default)
+// We use a custom action on the main program to catch cases where no sub-command is used
+program
+    .argument('[path]', 'Path to export file or directory to load in interactive mode')
+    .action(async (path) => {
+        // Set terminal title
+        process.stdout.write('\x1b]0;Coherence Chat Exporter\x07');
+        // Enter alternate screen buffer
+        process.stdout.write('\x1b[?1049h');
 
-    const app = render(React.createElement(App, {
-        onExit: () => app.unmount()
-    }));
+        // If the user runs `coherence`, path is undefined.
+        // If the user runs `coherence myfile.zip`, path is "myfile.zip".
+        const app = render(React.createElement(App, {
+            initialPath: path,
+            onExit: () => app.unmount()
+        }));
 
-    await app.waitUntilExit();
+        await app.waitUntilExit();
 
-    // Exit alternate screen buffer
-    process.stdout.write('\x1b[?1049l');
-} else {
-    program.parse(process.argv);
-}
+        // Exit alternate screen buffer on clean exit
+        process.stdout.write('\x1b[?1049l');
+    });
+
+program.parse(process.argv);
