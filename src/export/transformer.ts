@@ -1,6 +1,5 @@
 import matter from 'gray-matter';
 import { Conversation, Message } from '../providers/types.js';
-import { defaultConfig } from '../config.js';
 
 export class MarkdownTransformer {
   toMarkdown(conversation: Conversation): string {

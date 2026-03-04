@@ -97,7 +97,7 @@ export const App: React.FC<AppProps> = ({ onExit, initialPath }) => {
            setView(AppView.Browser);
            return;
          }
-       } catch (e) {
+       } catch {
          // Ignore and try next
        }
 
@@ -112,7 +112,7 @@ export const App: React.FC<AppProps> = ({ onExit, initialPath }) => {
            setView(AppView.Browser);
            return;
          }
-       } catch (e) {
+       } catch {
          // Ignore
        }
 

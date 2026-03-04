@@ -88,7 +88,7 @@ export class InputResolver {
             const cleanup = () => {
                 try {
                     zipfile.close();
-                } catch (e) {
+                } catch {
                     // ignore if already closed
                 }
             };
@@ -159,8 +159,8 @@ export class InputResolver {
                         projects = JSON.parse(projectsData.toString('utf8'));
                     }
                     resolve({ conversations, projects });
-                } catch (e) {
-                    reject(e);
+                } catch (error) {
+                    reject(error);
                 }
             });
 
@@ -176,7 +176,7 @@ export class InputResolver {
     const content = await fs.promises.readFile(path, 'utf-8');
     try {
       return JSON.parse(content);
-    } catch (e) {
+    } catch {
       throw new Error(`Failed to parse JSON at ${path}`);
     }
   }
