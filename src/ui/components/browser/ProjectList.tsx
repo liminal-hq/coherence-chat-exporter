@@ -7,9 +7,10 @@ interface ProjectListProps {
   onSelectProject: (projectName: string | null) => void;
   onBack: () => void;
   onViewStats?: () => void;
+  onChangeSource?: () => void;
 }
 
-export const ProjectList: React.FC<ProjectListProps> = ({ conversations, onSelectProject, onBack, onViewStats }) => {
+export const ProjectList: React.FC<ProjectListProps> = ({ conversations, onSelectProject, onBack, onViewStats, onChangeSource }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Extract unique projects
@@ -45,6 +46,9 @@ export const ProjectList: React.FC<ProjectListProps> = ({ conversations, onSelec
     if (input === 's' && onViewStats) {
         onViewStats();
     }
+    if ((input === 'c') && onChangeSource) {
+        onChangeSource();
+    }
   });
 
   return (
@@ -59,7 +63,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({ conversations, onSelec
         </Box>
       ))}
       <Box marginTop={1}>
-        <Text color="gray">[Enter] Select  [s] Stats  [Esc] Back</Text>
+        <Text color="gray">[Enter] Select  [s] Stats  [c] Change Source  [Esc] Back</Text>
       </Box>
     </Box>
   );

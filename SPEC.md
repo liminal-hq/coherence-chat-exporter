@@ -156,9 +156,27 @@ The "Browse & Export" flow allows users to select specific conversations to expo
 *   `Space`: Toggle selection.
 *   `Enter`: Open Preview (or select Project).
 *   `e`: Trigger Export of selected items.
+*   `s`: View Stats Dashboard.
+*   `c`: Change Data Source.
 *   `Esc` / `Backspace`: Go back / Cancel.
 
-### 4. Stats Dashboard
+### 4. File Browser
+
+A TUI component to browse the file system for selecting export directories or files.
+
+**Features:**
+*   Displays directories and relevant files (.json, .zip).
+*   Navigates hierarchy.
+*   Supports manual path input mode.
+
+**Key Inputs:**
+*   `Up`/`Down` (or `j`/`k`): Move selection.
+*   `Enter` / `Right Arrow`: Enter directory or select file.
+*   `Backspace` / `Left Arrow`: Go up one directory level.
+*   `Tab`: Toggle Manual Input Mode (type path directly).
+*   `Esc`: Cancel / Back.
+
+### 5. Stats Dashboard
 
 The Stats Dashboard provides insights into the loaded conversations before export.
 
@@ -179,7 +197,7 @@ The Stats Dashboard provides insights into the loaded conversations before expor
 *   `StatsDashboard.tsx`: Main view layout.
 *   `AsciiChart.tsx`: Reusable ASCII bar chart renderer.
 
-### 5. AI Tagging with Transformers.js
+### 6. AI Tagging with Transformers.js
 
 **Optional Enhancement Layer:**
 
@@ -283,7 +301,7 @@ auto_tagged: true
 ---
 ```
 
-### 6. Export Pipeline with Tagging
+### 7. Export Pipeline with Tagging
 
 ```typescript
 // src/export/pipeline.ts
@@ -333,7 +351,7 @@ class ExportPipeline {
 }
 ```
 
-### 7. Configuration with Tagging
+### 8. Configuration with Tagging
 
 ```json
 {
@@ -369,7 +387,7 @@ class ExportPipeline {
 }
 ```
 
-### 8. Colour Palette
+### 9. Colour Palette
 
 The TUI uses a specific set of standard terminal colours to ensure readability and consistency:
 

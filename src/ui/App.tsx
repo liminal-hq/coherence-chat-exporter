@@ -4,7 +4,7 @@ import { MainMenu } from './components/MainMenu.js';
 import { FullScreenLayout } from './components/FullScreenLayout.js';
 import { ProviderSelect } from './components/ProviderSelect.js';
 import { ProgressBar } from './components/ProgressBar.js';
-import { PathInput } from './components/PathInput.js';
+import { FileBrowser } from './components/FileBrowser.js';
 import { TaggingSetup } from './components/TaggingSetup.js';
 import { Settings } from './components/Settings.js';
 import { Browser } from './components/browser/Browser.js';
@@ -60,6 +60,7 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
   const [exportCount, setExportCount] = useState(0);
 
   // Data state
+  const [sessionPath, setSessionPath] = useState<string | null>(null);
   const [loadedConversations, setLoadedConversations] = useState<Conversation[]>([]);
 
   // Load config on mount
@@ -75,15 +76,32 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
     }
     if (value === MenuOption.Source) {
         setMode(AppMode.Export);
-        setView(AppView.SelectProvider);
+        // If we have a session path, allow user to confirm or change
+        if (sessionPath) {
+             // For export flow, we might want to confirm specific file even if path is known
+             // But let's assume if they picked Source they might want to change it.
+             // Actually per requirements: "from the export view we can have an option there to change the location"
+             // So we go to provider select -> path input (which shows current path as default or starts browser)
+             setView(AppView.SelectProvider);
+        } else {
+             setView(AppView.SelectProvider);
+        }
     }
     if (value === MenuOption.Browse) {
         setMode(AppMode.Browse);
-        setView(AppView.SelectProvider);
+        if (sessionPath && loadedConversations.length > 0) {
+            setView(AppView.Browser);
+        } else {
+            setView(AppView.SelectProvider);
+        }
     }
     if (value === MenuOption.Stats) {
         setMode(AppMode.Stats);
-        setView(AppView.SelectProvider);
+        if (sessionPath && loadedConversations.length > 0) {
+            setView(AppView.Stats);
+        } else {
+            setView(AppView.SelectProvider);
+        }
     }
     if (value === MenuOption.Tagging) setView(AppView.TaggingSetup);
     if (value === MenuOption.Settings) setView(AppView.Settings);
@@ -91,10 +109,20 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
 
   const handleProviderSelect = (provider: 'claude' | 'chatgpt') => {
     setProviderName(provider);
+    // If we have a session path and we are just re-entering browse/stats, maybe we should skip input?
+    // But if they came from ProviderSelect, they likely want to confirm/change.
+    // Let's go to input path, but maybe FileBrowser handles pre-filled path?
     setView(AppView.InputPath);
   };
 
+  const handleChangeSource = () => {
+      // Keep provider, just go back to input path
+      setView(AppView.InputPath);
+  };
+
   const handlePathSubmit = async (pathStr: string) => {
+      setSessionPath(pathStr); // Remember this path for the session
+
       if (mode === AppMode.Export) {
         setView(AppView.Exporting);
         setStatus('Initializing export...');
@@ -193,8 +221,8 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
           <ProviderSelect onSelect={handleProviderSelect} onBack={() => setView(AppView.Menu)} />
       )}
       {view === AppView.InputPath && (
-          <PathInput
-            prompt={`Enter path to ${providerName} export directory (or .zip/.json):`}
+          <FileBrowser
+            prompt={`Select ${providerName} export directory or file:`}
             onSubmit={handlePathSubmit}
             onCancel={() => setView(AppView.SelectProvider)}
           />
@@ -207,6 +235,7 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
             onExport={handleBrowserExport}
             onBack={() => setView(AppView.Menu)}
             onViewStats={() => setView(AppView.Stats)}
+            onChangeSource={handleChangeSource}
           />
       )}
 
@@ -217,6 +246,7 @@ export const App: React.FC<AppProps> = ({ onExit }) => {
                 if (mode === AppMode.Browse) setView(AppView.Browser);
                 else setView(AppView.Menu);
             }}
+            onChangeSource={handleChangeSource}
           />
       )}
 
