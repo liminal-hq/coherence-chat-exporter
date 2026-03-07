@@ -2,24 +2,59 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 24.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: '24'
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-    - name: Lint
-      run: npm run lint
+      - uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Lint Summary
+        if: always()
+        run: |
+          echo "## Lint Summary" >> $GITHUB_STEP_SUMMARY
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Lint Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Lint Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Check logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Check formatting
+        run: npm run format:check
+      - name: Format Summary
+        if: always()
+        run: |
+          echo "## Format Summary" >> $GITHUB_STEP_SUMMARY
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Formatting Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Formatting Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`npm run format\` locally and commit the result." >> $GITHUB_STEP_SUMMARY
+          fi
 
   test:
     runs-on: ubuntu-latest
@@ -28,47 +63,103 @@ jobs:
       checks: write
       pull-requests: write
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 24.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: '24'
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-    - name: Test
-      run: npm test
-    - name: Upload Test Results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: reports/junit.xml
-    - name: Publish Test Report
-      uses: dorny/test-reporter@v1
-      if: success() || failure()
-      with:
-        name: Jest Tests
-        path: reports/junit.xml
-        reporter: jest-junit
+      - uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Test
+        run: npm test
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: reports/junit.xml
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Jest Tests
+          path: reports/junit.xml
+          reporter: jest-junit
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Tests Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Check logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
 
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 24.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: '24'
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-    - name: Build
-      run: npm run build
-    - name: Bundle
-      run: node scripts/bundle.js
-    - name: Upload Bundle
-      uses: actions/upload-artifact@v4
-      with:
-        name: coherence-bundle
-        path: dist/coherence.bundle.mjs
+      - uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Bundle
+        run: node scripts/bundle.js
+      - name: Upload Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: coherence-bundle
+          path: dist/coherence.bundle.mjs
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Build Succeeded" >> $GITHUB_STEP_SUMMARY
+            echo "Output size: $(du -sh dist | cut -f1)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Build Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  binary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: npm ci
+      - name: Build TypeScript
+        run: npm run build
+      - name: Build standalone binary
+        run: npm run build:binary
+      - name: Smoke test binary
+        run: ./dist/coherence --help
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coherence-binary
+          path: dist/coherence*
+          if-no-files-found: error
+      - name: Binary Summary
+        if: always()
+        run: |
+          echo "## Binary Build Summary" >> $GITHUB_STEP_SUMMARY
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Binary Build Succeeded" >> $GITHUB_STEP_SUMMARY
+            echo "Binary size: $(du -sh dist/coherence | cut -f1)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Binary Build Failed" >> $GITHUB_STEP_SUMMARY
+          fi
