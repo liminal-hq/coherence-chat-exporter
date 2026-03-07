@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Release tag (must start with v)
-        required: true
+        description: Optional release tag (must start with v). Defaults to v<package.json version>.
+        required: false
         type: string
       release_draft:
         description: Create or keep this release as draft
@@ -32,6 +32,9 @@ jobs:
       release_name: ${{ steps.meta.outputs.release_name }}
       release_id: ${{ steps.release.outputs.release_id }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
       - name: Resolve release tag
         id: meta
         shell: bash
@@ -39,7 +42,17 @@ jobs:
           set -euo pipefail
 
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            TAG="${{ inputs.release_tag }}"
+            INPUT_TAG="${{ inputs.release_tag }}"
+            if [[ -n "${INPUT_TAG}" ]]; then
+              TAG="${INPUT_TAG}"
+            else
+              PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+              if [[ -z "${PACKAGE_VERSION}" ]]; then
+                echo "Could not resolve version from package.json" >&2
+                exit 1
+              fi
+              TAG="v${PACKAGE_VERSION}"
+            fi
           else
             TAG="${GITHUB_REF_NAME}"
           fi
@@ -186,7 +199,7 @@ jobs:
           (Get-FileHash $asset -Algorithm SHA256).Hash.ToLower() + "  " + (Split-Path $asset -Leaf) | Out-File -FilePath "$asset.sha256" -Encoding ascii
 
       - name: Upload release artefact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coherence-${{ matrix.target }}
           path: dist/coherence-${{ needs.prepare-release.outputs.tag_name }}-${{ matrix.target }}*
@@ -228,7 +241,7 @@ jobs:
         run: npm pack
 
       - name: Upload package artefacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coherence-packages
           path: |
@@ -243,7 +256,7 @@ jobs:
     needs: [prepare-release, build-binaries, build-packages]
     steps:
       - name: Download artefacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: release-assets
           merge-multiple: true

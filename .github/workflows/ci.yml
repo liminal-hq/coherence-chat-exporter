@@ -75,7 +75,7 @@ jobs:
         run: npm test
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: reports/junit.xml
@@ -113,7 +113,7 @@ jobs:
       - name: Bundle
         run: node scripts/bundle.js
       - name: Upload Bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coherence-bundle
           path: dist/coherence.bundle.mjs
@@ -148,7 +148,7 @@ jobs:
       - name: Smoke test binary
         run: ./dist/coherence --help
       - name: Upload binary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coherence-binary
           path: dist/coherence*

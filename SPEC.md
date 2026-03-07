@@ -466,6 +466,7 @@ chat-archive/
 The release workflow is multi-job and follows:
 
 1. `prepare-release`: Resolve tag and create/reuse the GitHub release.
+   - Manual dispatch may omit `release_tag`; the workflow falls back to `v<package.json version>`.
 2. `build-binaries`: Matrix Bun `--target` builds across Linux/macOS/Windows targets, then upload binaries and SHA-256 checksum files.
 3. `build-packages`: Build and upload existing Node-based release artefacts (bundle, AppImages, npm tarball).
 4. `publish-release`: Download all artefacts and attach them to the release.
