@@ -41,10 +41,17 @@ Includes optional **AI Semantic Tagging** using a local BERT model to automatica
     npm run build
     ```
 
-4.  (Optional) Link globally:
+4.  (Optional) Build a standalone executable with Bun:
+    ```bash
+    npm run build:binary
+    ```
+
+5.  (Optional) Link globally:
     ```bash
     npm link
     ```
+
+`npm run build:binary` requires Bun to be installed.
 
 ## Usage
 
@@ -211,8 +218,16 @@ The tool uses the `Xenova/mobilebert-uncased-mnli` model (via `@huggingface/tran
 ## Development
 
 -   **Build**: `npm run build` (Compiles TypeScript to `dist/`)
+-   **Build Binary**: `npm run build:binary` (Compiles a standalone executable to `dist/coherence`)
 -   **Test**: `npm test` (Runs Jest unit tests)
 -   **Lint**: `npm run lint` (if configured)
+-   **Format Check**: `npm run format:check` (Checks workflow and package-file formatting)
+
+## Release Artefacts
+
+GitHub releases now publish:
+-   Bun standalone binaries for Linux, macOS, and Windows (with `.sha256` checksums).
+-   Existing Node-based artefacts (`dist/coherence.bundle.mjs`, AppImages, and `.tgz` package tarballs).
 
 ## License
 

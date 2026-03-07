@@ -1,4 +1,3 @@
-import { pipeline } from '@huggingface/transformers';
 import { Conversation } from '../providers/types.js';
 import { defaultConfig } from '../config.js';
 
@@ -15,6 +14,7 @@ export class ConversationTagger {
   async initialize() {
     // Downloads model on first run
     // env.cacheDir = './.cache'; // Optional: local cache
+    const { pipeline } = await import('@huggingface/transformers');
     this.classifier = await pipeline(
       'zero-shot-classification',
       defaultConfig.tagging.model

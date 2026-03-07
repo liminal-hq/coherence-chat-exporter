@@ -1,4 +1,4 @@
-.TH COHERENCE 1 "February 2024" "1.0.0" "User Commands"
+.TH COHERENCE 1 "March 2026" "1.0.0" "User Commands"
 .SH NAME
 coherence \- Coherence Chat Exporter: Export Claude/ChatGPT conversations to Markdown
 .SH SYNOPSIS
@@ -10,6 +10,8 @@ coherence \- Coherence Chat Exporter: Export Claude/ChatGPT conversations to Mar
 .SH DESCRIPTION
 .B coherence
 is a CLI tool with a TUI (Text User Interface) for exporting and organising Claude and ChatGPT conversations into readable Markdown files. It supports processing individual JSON files, directories of files, or ZIP archives.
+
+GitHub releases include standalone Bun-compiled executables for supported Linux, macOS, and Windows targets, plus SHA-256 checksum files.
 
 If no command is specified, \fBcoherence\fR launches in \fBInteractive Mode\fR, allowing users to browse, search, and select conversations for export using a terminal interface.
 .SH INTERACTIVE MODE
@@ -96,6 +98,16 @@ User configuration file (path may vary based on XDG_CONFIG_HOME).
 .TP
 .B ~/.local/share/coherence/
 Data storage for the application.
+.SH DISTRIBUTION
+.TP
+.B Standalone binaries
+Release assets include platform-specific standalone executables named like
+.B coherence-vX.Y.Z-linux-x64
+(or
+.B .exe
+on Windows), alongside matching
+.B .sha256
+checksum files.
 .SH BUGS
 Please report any bugs or issues to the GitHub repository issue tracker.
 .SH AUTHOR
