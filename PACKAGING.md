@@ -26,9 +26,20 @@ npx coherence-chat-exporter export ...
 4.  The GitHub Action will automatically:
     -   Build the project.
     -   Create a release on GitHub.
-     -   Upload the NPM tarball (`.tgz`) and the bundled script (`dist/coherence.bundle.mjs`).
+    -   Build and upload Bun standalone binaries for Linux/macOS/Windows with `.sha256` checksums.
+    -   Upload the NPM tarball (`.tgz`), bundled script (`dist/coherence.bundle.mjs`), and Linux AppImages.
 
-## 2. Standalone Bundle
+## 2. Standalone Bun Binary
+
+A standalone executable can be built locally with Bun:
+
+```bash
+npm run build:binary
+```
+
+This produces `dist/coherence` (or `dist/coherence.exe` on Windows).
+
+## 3. Standalone Bundle
 
  A single-file bundle is generated at `dist/coherence.bundle.mjs` during the release process. This file contains most dependencies bundled together (except for native modules like `onnxruntime-node`).
 
@@ -41,7 +52,7 @@ You can run this bundle directly with Node.js:
 
 *Note: If you use features requiring native modules (like AI tagging), you must ensure `node_modules` are available or installed alongside the script.*
 
- ## 3. AppImage (Linux)
+ ## 4. AppImage (Linux)
 
  A standalone AppImage for Linux is generated during the release. This is a self-contained executable that includes Node.js. Both `x64` and `arm64` architectures are supported.
 
@@ -52,7 +63,7 @@ You can run this bundle directly with Node.js:
 
  *Note: AppImages do not automatically install shell completion. You must manually source the completion script as described below.*
 
- ## 4. Shell Completion
+ ## 5. Shell Completion
 
 The tool supports generating completion scripts for Bash, Zsh, and Fish.
 

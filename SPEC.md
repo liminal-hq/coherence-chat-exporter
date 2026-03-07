@@ -401,6 +401,7 @@ The TUI uses a specific set of standard terminal colours to ensure readability a
 
 **Core:**
 - TypeScript + Node.js
+- Bun (standalone executable builds)
 - Commander.js (CLI framework)
 - **Ink** (React-based TUI) ✨
 - **@xenova/transformers** (AI tagging, optional)
@@ -441,6 +442,33 @@ chat-archive/
 ├── tsconfig.json
 └── README.md
 ```
+
+## Build and Release Pipeline
+
+### Local Build Scripts
+
+- `npm run build`: Compile TypeScript output to `dist/`.
+- `npm run bundle`: Create the Node bundle at `dist/coherence.bundle.mjs`.
+- `npm run build:binary`: Compile a standalone Bun executable at `dist/coherence`.
+- `npm run build:release`: Run TypeScript build, bundle creation, and Bun binary compilation in sequence.
+
+### CI Behaviour
+
+- Lint, format-check, test, and build jobs run with Node.js.
+- A dedicated `binary` job installs Bun and runs:
+  1. `npm run build`
+  2. `npm run build:binary`
+  3. `./dist/coherence --help` smoke test
+- CI jobs publish `GITHUB_STEP_SUMMARY` results for quick run-status visibility.
+
+### Release Workflow Architecture
+
+The release workflow is multi-job and follows:
+
+1. `prepare-release`: Resolve tag and create/reuse the GitHub release.
+2. `build-binaries`: Matrix Bun `--target` builds across Linux/macOS/Windows targets, then upload binaries and SHA-256 checksum files.
+3. `build-packages`: Build and upload existing Node-based release artefacts (bundle, AppImages, npm tarball).
+4. `publish-release`: Download all artefacts and attach them to the release.
 
 ## Usage Flow with Tagging
 
